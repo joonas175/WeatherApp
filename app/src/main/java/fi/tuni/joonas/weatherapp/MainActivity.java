@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,16 +26,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        startWeatherService();
         startLocationService();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                new IntentFilter("location-update"));
+                new IntentFilter("weather-update"));
 
     }
 
     public void debugLoc(Location loc){
         if(loc != null)
             Log.d("konaa",loc.getLatitude() + " " + loc.getLongitude());
+    }
+
+
+    public void startWeatherService(){
+        Intent intent = new Intent(this, MyWeatherService.class);
+        startService(intent);
     }
 
     public void startLocationService(){
@@ -74,7 +82,18 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("asd" ,intent.getDoubleExtra("lat", 0.0) + " " + intent.getDoubleExtra("lon", 0.0));
+            String city = intent.getStringExtra("city");
+            String condition = intent.getStringExtra("condition");
+            String temp = intent.getStringExtra("temp");
+            Log.d("asd" ,city + " " + temp + " " + condition);
+
+            updateTexts(city,condition,temp);
         }
     };
+
+    public void updateTexts(String city, String condition, String temp){
+        ((TextView) findViewById(R.id.city)).setText("City: " + city);
+        ((TextView) findViewById(R.id.condition)).setText("Condition: " + condition);
+        ((TextView) findViewById(R.id.temp)).setText("Temperature: " + temp);
+    }
 }

@@ -64,7 +64,7 @@ public class MyLocationService extends Service {
 
     class MyLocationListener implements LocationListener{
         public void onLocationChanged(Location location) {
-            // Called when a new location is found by the network location provider.
+
             debugLoc(location);
 
             Intent intent = new Intent("location-update");
