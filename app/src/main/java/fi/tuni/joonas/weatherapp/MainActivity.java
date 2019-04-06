@@ -18,9 +18,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+
+import java.util.Arrays;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
+
+    String city;
+    String condition;
+    String temp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("weather-update"));
 
+        Places.initialize(getApplicationContext(), "AIzaSyDFo5X0ashZRIy8jVK0kmQ6u8UsvMB8zPo");
+
+        PlacesClient placesClient = Places.createClient(this);
     }
 
     public void debugLoc(Location loc){
@@ -95,5 +111,16 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.city)).setText("City: " + city);
         ((TextView) findViewById(R.id.condition)).setText("Condition: " + condition);
         ((TextView) findViewById(R.id.temp)).setText("Temperature: " + temp);
+    }
+
+    public void startMap(View v){
+        int AUTOCOMPLETE_REQUEST_CODE = 1;
+
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+
+        Intent intent = new Autocomplete.IntentBuilder(
+                AutocompleteActivityMode.FULLSCREEN, fields)
+                .build(this);
+        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
     }
 }

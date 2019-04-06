@@ -11,20 +11,25 @@
         android:id="@+id/city"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="City: "
         android:textSize="30sp" />
 
     <TextView
         android:id="@+id/temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="Temperature: "
         android:textSize="30sp" />
 
     <TextView
         android:id="@+id/condition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="Condition: "
         android:textSize="30sp" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select location"
+        android:onClick="startMap"/>
 </LinearLayout>
