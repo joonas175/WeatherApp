@@ -10,3 +10,4 @@
 /captures
 .externalNativeBuild
 /release1
+app/src/main/res/values/secrets\.xml
