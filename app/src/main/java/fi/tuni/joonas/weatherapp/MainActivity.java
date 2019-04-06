@@ -135,6 +135,11 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 Log.i("Selected location", "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
+
+                Intent intent = new Intent("location-update");
+                intent.putExtra("lat", place.getLatLng().latitude);
+                intent.putExtra("lon", place.getLatLng().longitude);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
