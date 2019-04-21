@@ -9,13 +9,18 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.Status;
@@ -27,6 +32,7 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,11 +40,11 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
 
-    String city;
-    String condition;
-    String temp;
-
     int AUTOCOMPLETE_REQUEST_CODE = 1;
+
+    ArrayList<Forecast> forecasts;
+
+    RecyclerView rvForecasts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +56,20 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("weather-update"));
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(forecastReceiver,
+                new IntentFilter("forecast-update"));
+
         Places.initialize(getApplicationContext(), getString(R.string.apikey));
 
         PlacesClient placesClient = Places.createClient(this);
+
+        forecasts = new ArrayList<>();
+
+        rvForecasts = (RecyclerView) findViewById(R.id.forecasts);
+        ForecastAdapter adapter = new ForecastAdapter(forecasts);
+        rvForecasts.setAdapter(adapter);
+        rvForecasts.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
     public void debugLoc(Location loc){
@@ -106,16 +123,22 @@ public class MainActivity extends AppCompatActivity {
             String city = intent.getStringExtra("city");
             String condition = intent.getStringExtra("condition");
             String temp = intent.getStringExtra("temp");
+            Long wind = intent.getLongExtra("wind", 0);
+            int image = intent.getIntExtra("icon", 1);
             Log.d("asd" ,city + " " + temp + " " + condition);
 
-            updateTexts(city,condition,temp);
+            updateTexts(city,condition,temp, wind, image);
         }
     };
 
-    public void updateTexts(String city, String condition, String temp){
-        ((TextView) findViewById(R.id.city)).setText("City: " + city);
-        ((TextView) findViewById(R.id.condition)).setText("Condition: " + condition);
-        ((TextView) findViewById(R.id.temp)).setText("Temperature: " + temp);
+
+    public void updateTexts(String city, String condition, String temp, Long wind, int icon){
+        ((TextView) findViewById(R.id.city)).setText(city);
+        ((TextView) findViewById(R.id.description)).setText(condition);
+        ((TextView) findViewById(R.id.temp)).setText(temp + " °C");
+        ((TextView) findViewById(R.id.wind)).setText(wind + " m/s");
+        ((ImageView) findViewById(R.id.condition)).setImageResource(icon);
+        System.out.println("kong kool " + icon);
     }
 
     public void startMap(View v){
@@ -141,12 +164,29 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("lon", place.getLatLng().longitude);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                // TODO: Handle the error.
+
                 Status status = Autocomplete.getStatusFromIntent(data);
                 Log.i("Selected location", status.getStatusMessage());
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
             }
         }
+    }
+
+    private BroadcastReceiver forecastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ArrayList<Forecast> forecasts = intent.getParcelableArrayListExtra("forecasts");
+            System.out.println("main kong");
+
+            setForecasts(forecasts);
+
+        }
+    };
+
+    public void setForecasts(List<Forecast> forecasts){
+        this.forecasts.clear();
+        this.forecasts.addAll(forecasts);
+        rvForecasts.getAdapter().notifyDataSetChanged();
     }
 }
