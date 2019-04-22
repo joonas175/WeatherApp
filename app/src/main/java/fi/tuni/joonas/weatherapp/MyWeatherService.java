@@ -16,21 +16,23 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service that handles request to weather API (OpenWeatherMap).
+ *
+ * @author Joonas Salojärvi
+ * @version 2019.04.22
+ * @since 2019.04.22
+ */
 public class MyWeatherService extends Service {
 
-    private final String appId = "81be560b0713295bd67e9c8df0dd5e67";
 
 
     @Override
@@ -38,6 +40,13 @@ public class MyWeatherService extends Service {
         return null;
     }
 
+    /**
+     * Called when service starts. Starts listener for location updates.
+     * @param intent intent
+     * @param flags flags
+     * @param startId startid
+     * @return Service param (STICKY)
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -48,14 +57,34 @@ public class MyWeatherService extends Service {
         return START_STICKY;
     }
 
+    /**
+     * Handles location updates. On location update, starts new async tasks to fetch new weather
+     * info for given location.
+     * @param lat Latitude
+     * @param lon Longitude
+     */
     public void updateWeather(double lat, double lon){
+        String appId = getString(R.string.owmapikey);
+
         new ConnectionTask().execute("http://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat +"&lon=" + lon + "&appId=" + appId, "current");
         new ConnectionTask().execute("http://api.openweathermap.org/data/2.5/forecast?units=metric&lat=" + lat +"&lon=" + lon + "&appId=" + appId + "&cnt=24", "forecast");
 
     }
 
+    /**
+     * Requests weather info from API.
+     *
+     * @author Joonas Salojärvi
+     * @version 2019.04.22
+     * @since 2019.04.22
+     */
     private class ConnectionTask extends AsyncTask<String, Void, String>{
 
+        /**
+         * Method for fetching info in the background.
+         * @param strings Params (URL)
+         * @return null
+         */
         @Override
         protected String doInBackground(String... strings) {
             String response = "";
@@ -70,7 +99,6 @@ public class MyWeatherService extends Service {
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(con.getInputStream()));
 
-                //poista kaikki tän jälkeen
                 String inputLine;
                 StringBuffer content = new StringBuffer();
                 while ((inputLine = in.readLine()) != null) {
@@ -86,16 +114,23 @@ public class MyWeatherService extends Service {
             return null;
         }
 
+        /**
+         * Parses response json and sends weather update broadcast accordingly.
+         * @param response Response from http request (weather info in JSON format)
+         * @param param Type of response
+         */
         protected void parseValuesFromResponse(String response, String param){
             if(param.equalsIgnoreCase("current")){
-                JsonElement jelement = new JsonParser().parse(response);
 
+                //Get whole response as JSON object
+                JsonElement jelement = new JsonParser().parse(response);
                 JsonObject jobject = jelement.getAsJsonObject();
 
+                //Parse main object
                 JsonObject main = jobject.getAsJsonObject("main");
 
+                //Parse weather object
                 JsonObject weather = jobject.getAsJsonArray("weather").get(0).getAsJsonObject();
-
 
                 Intent intent = new Intent("weather-update");
                 intent.putExtra("condition", weather.get("description").getAsString());
@@ -105,21 +140,32 @@ public class MyWeatherService extends Service {
                 intent.putExtra("icon", getIconInt(weather.get("icon").getAsString()));
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             } else if (param.equalsIgnoreCase("forecast")){
-                JsonElement jelement = new JsonParser().parse(response);
 
+                //Get whole response as JSON object
+                JsonElement jelement = new JsonParser().parse(response);
                 JsonObject jobject = jelement.getAsJsonObject();
 
+                //Get array of forecasts
                 JsonArray jarray = jobject.getAsJsonArray("list");
+
                 List<Forecast> forecasts = new ArrayList<Forecast>();
+
+                //Iterate every forecast and add info to forecasts array
                 for(JsonElement forecastJson : jarray){
                     JsonObject forecastObject = forecastJson.getAsJsonObject();
+
+                    //Time
                     String time = forecastObject.get("dt_txt").getAsString();
 
+                    //Weather desc and icon id from main object
                     JsonObject weather = forecastObject.get("weather").getAsJsonArray().get(0).getAsJsonObject();
                     String desc = weather.get("description").getAsString();
                     int icon = getIconInt(weather.get("icon").getAsString());
 
+                    //Temperature
                     int temp = Math.round(forecastObject.get("main").getAsJsonObject().get("temp").getAsFloat());
+
+                    //Wind speed
                     float wind = forecastObject.get("wind").getAsJsonObject().get("speed").getAsFloat();
 
                     forecasts.add(new Forecast(time, desc, icon, temp, wind));
@@ -136,6 +182,11 @@ public class MyWeatherService extends Service {
 
     }
 
+    /**
+     * Translates icon id from server response to android corresponding id
+     * @param icon Icon id (server response)
+     * @return Icon id (android)
+     */
     private int getIconInt(String icon) {
         switch (icon){
             case "01d": return R.drawable.w01d;
@@ -162,6 +213,9 @@ public class MyWeatherService extends Service {
         return R.drawable.w01d;
     }
 
+    /**
+     * Receiver to listen for location updates. Updates weather when location is changed.
+     */
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

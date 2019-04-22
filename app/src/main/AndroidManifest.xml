@@ -29,7 +29,6 @@
         <service android:name=".MyLocationService" />
         <service android:name=".MyWeatherService" />
 
-        <activity android:name=".MapActivity"></activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/apikey"/>

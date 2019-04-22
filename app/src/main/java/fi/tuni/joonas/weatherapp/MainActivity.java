@@ -164,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
             String temp = intent.getStringExtra("temp");
             Long wind = intent.getLongExtra("wind", 0);
             int image = intent.getIntExtra("icon", 1);
-            Log.d("asd" ,city + " " + temp + " " + condition);
 
             updateTexts(city,condition,temp, wind, image);
         }
@@ -186,7 +185,11 @@ public class MainActivity extends AppCompatActivity {
         ((ImageView) findViewById(R.id.condition)).setImageResource(icon);
     }
 
-    public void startMap(View v){
+    /**
+     * Builds and starts Google's autocomplete search for cities.
+     * @param v View (button)
+     */
+    public void startAutocompleteSearch(View v){
 
 
         List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
@@ -197,6 +200,14 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
     }
 
+    /**
+     * Handles result from Google's autocomplete search. Sends city's latlong values as a local
+     * broadcast.
+     *
+     * @param requestCode Request code
+     * @param resultCode Result code
+     * @param data Intent data from result
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
@@ -218,17 +229,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Local broadcast receiver for forecasts.
+     */
     private BroadcastReceiver forecastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             ArrayList<Forecast> forecasts = intent.getParcelableArrayListExtra("forecasts");
-            System.out.println("main kong");
 
             setForecasts(forecasts);
 
         }
     };
 
+    /**
+     * Sets forecasts and notifies RecyclerViews adapter that the data has changed.
+     * @param forecasts All forecasts to be displayed
+     */
     public void setForecasts(List<Forecast> forecasts){
         this.forecasts.clear();
         this.forecasts.addAll(forecasts);

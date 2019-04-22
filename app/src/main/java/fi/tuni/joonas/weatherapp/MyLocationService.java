@@ -1,28 +1,24 @@
 package fi.tuni.joonas.weatherapp;
 
-import android.Manifest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
+/**
+ * Location service to handle location updates.
+ *
+ * @author Joonas Salojärvi
+ * @version 2019.04.22
+ * @since 2019.04.22
+ */
 public class MyLocationService extends Service {
-
-    int MY_PERMISSIONS_REQUEST_LOCATION;
-
-
 
 
     @Override
@@ -36,6 +32,14 @@ public class MyLocationService extends Service {
 
     }
 
+    /**
+     * Method that's called when launching the service. Calls method to start a listener for
+     * location updates.
+     * @param intent intent
+     * @param flags flags
+     * @param startId startId
+     * @return Service param (STICKY)
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -47,7 +51,9 @@ public class MyLocationService extends Service {
     }
 
 
-
+    /**
+     * Starts location listener. Sends new location update broadcast every 1000 meters.
+     */
     public void startListener(){
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -62,10 +68,23 @@ public class MyLocationService extends Service {
 
     }
 
+    /**
+     * Location listener that handles location updates.
+     *
+     * @author Joonas Salojärvi
+     * @version 2019.04.22
+     * @since 2019.04.22
+     */
     class MyLocationListener implements LocationListener{
+
+        /**
+         * Called when location has changed. Sends local broadcast to inform other services of
+         * location update.
+         * @param location Current location
+         */
         public void onLocationChanged(Location location) {
 
-            debugLoc(location);
+            //debugLoc(location);
 
             Intent intent = new Intent("location-update");
             intent.putExtra("lat", location.getLatitude());
@@ -80,9 +99,13 @@ public class MyLocationService extends Service {
 
         public void onProviderDisabled(String provider) {}
 
+        /**
+         * For debugging purposes. Prints location to log.
+         * @param loc Location to print
+         */
         public void debugLoc(Location loc){
             if(loc != null)
-                Log.d("konaa",loc.getLatitude() + " " + loc.getLongitude());
+                Log.d("LocationService",loc.getLatitude() + " " + loc.getLongitude());
         }
 
     }
