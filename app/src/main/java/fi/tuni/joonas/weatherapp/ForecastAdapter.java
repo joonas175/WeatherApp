@@ -2,7 +2,6 @@ package fi.tuni.joonas.weatherapp;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +10,31 @@ import android.widget.TextView;
 
 import java.util.List;
 
+/**
+ * Adapter that helps populate the RecyclerView in main activity.
+ *
+ * @author Joonas Salojärvi
+ * @version 2019.04.22
+ * @since 2019.04.22
+ */
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHolder> {
 
+    /**
+     * All forecasts for a single location.
+     */
     private List<Forecast> forecasts;
 
     public ForecastAdapter(List<Forecast> forecasts){
         this.forecasts = forecasts;
     }
 
+    /**
+     * Method from super. Inflates a single row item.
+     *
+     * @param parent from super
+     * @param viewType from super
+     * @return ViewHolder, that holds a single row item
+     */
     @Override
     public ForecastAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -30,6 +46,12 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         return viewHolder;
     }
 
+    /**
+     * Sets texts to ViewHolder
+     *
+     * @param viewHolder ViewHolder to access
+     * @param position Position of ViewHolder
+     */
     @Override
     public void onBindViewHolder(ForecastAdapter.ViewHolder viewHolder, int position) {
         Forecast forecast = forecasts.get(position);
@@ -41,11 +63,22 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         viewHolder.wind.setText(forecast.wind + " m/s");
     }
 
+    /**
+     * Amount of forecasts
+     * @return Amount of forecasts
+     */
     @Override
     public int getItemCount() {
         return forecasts.size();
     }
 
+    /**
+     * Class that helps changing the texts for a forecast.
+     *
+     * @author Joonas Salojärvi
+     * @version 2019.04.22
+     * @since 2019.04.22
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView date;
         ImageView icon;

@@ -36,16 +36,41 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Main activity for this application. This application doesn't contain any other activities
+ * inside it. Shows weather information for selected location. Launches Google's city search.
+ *
+ * @author Joonas Salojärvi
+ * @version 2019.04.22
+ * @since 2019.04.22
+ */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Request code to request location permission.
+     */
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
 
-    int AUTOCOMPLETE_REQUEST_CODE = 1;
+    /**
+     * Request code for Google's autocomplete location search.
+     */
+    public final int AUTOCOMPLETE_REQUEST_CODE = 2;
 
+    /**
+     * List of all forecasts.
+     */
     ArrayList<Forecast> forecasts;
 
+    /**
+     * Forecast RecyclerView. Shows all forecasts in a scrollable list.
+     */
     RecyclerView rvForecasts;
 
+    /**
+     * Handles setting up all the elements when creating the activity.
+     *
+     * @param savedInstanceState Instances saved in app bundle.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,17 +97,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void debugLoc(Location loc){
-        if(loc != null)
-            Log.d("konaa",loc.getLatitude() + " " + loc.getLongitude());
-    }
-
-
+    /**
+     * Method to start the weather service.
+     * @see MyWeatherService
+     */
     public void startWeatherService(){
         Intent intent = new Intent(this, MyWeatherService.class);
         startService(intent);
     }
 
+    /**
+     * Method to start the location service. Also requests location permission.
+     */
     public void startLocationService(){
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -100,6 +126,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    /**
+     * This method handles starting the location service, if the service wasn't started in
+     * startLocationService method()
+     *
+     * @param requestCode Request code for a single permission.
+     * @param permissions Permissions granted for this app
+     * @param grantResults All granted permissions
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -117,6 +152,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Receiver for current weather updates from MyWeatherService. Handles the received bundle and
+     * passes it's information on to change the texts.
+     */
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -131,14 +170,20 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-
+    /**
+     * Handles changing the current weather's texts in this activity.
+     * @param city Location
+     * @param condition Description of weather condition
+     * @param temp Current temperature
+     * @param wind Wind speed
+     * @param icon Icon to be used
+     */
     public void updateTexts(String city, String condition, String temp, Long wind, int icon){
         ((TextView) findViewById(R.id.city)).setText(city);
         ((TextView) findViewById(R.id.description)).setText(condition);
         ((TextView) findViewById(R.id.temp)).setText(temp + " °C");
         ((TextView) findViewById(R.id.wind)).setText(wind + " m/s");
         ((ImageView) findViewById(R.id.condition)).setImageResource(icon);
-        System.out.println("kong kool " + icon);
     }
 
     public void startMap(View v){
