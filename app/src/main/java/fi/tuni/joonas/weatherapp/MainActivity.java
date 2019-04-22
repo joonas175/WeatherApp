@@ -213,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                Log.i("Selected location", "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
 
                 Intent intent = new Intent("location-update");
                 intent.putExtra("lat", place.getLatLng().latitude);
@@ -222,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
 
                 Status status = Autocomplete.getStatusFromIntent(data);
-                Log.i("Selected location", status.getStatusMessage());
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
             }

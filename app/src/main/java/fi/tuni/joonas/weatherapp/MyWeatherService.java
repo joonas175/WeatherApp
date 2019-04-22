@@ -110,7 +110,6 @@ public class MyWeatherService extends Service {
             } catch (Exception e){
                 e.printStackTrace();
             }
-            Log.d("MyWeatherService", response);
             return null;
         }
 
@@ -219,7 +218,6 @@ public class MyWeatherService extends Service {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("MyWeatherService" ,intent.getDoubleExtra("lat", 0.0) + " " + intent.getDoubleExtra("lon", 0.0));
             updateWeather(intent.getDoubleExtra("lat", 0.0), intent.getDoubleExtra("lon", 0.0));
         }
     };
