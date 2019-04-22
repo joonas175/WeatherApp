@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
         forecasts = new ArrayList<>();
 
-        rvForecasts = (RecyclerView) findViewById(R.id.forecasts);
+        rvForecasts = findViewById(R.id.forecasts);
         ForecastAdapter adapter = new ForecastAdapter(forecasts);
         rvForecasts.setAdapter(adapter);
         rvForecasts.setLayoutManager(new LinearLayoutManager(this));

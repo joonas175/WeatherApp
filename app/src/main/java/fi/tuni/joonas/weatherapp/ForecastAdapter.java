@@ -88,11 +88,11 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         public ViewHolder(View itemView) {
             super(itemView);
 
-            date = (TextView) itemView.findViewById(R.id.date);
-            icon = (ImageView) itemView.findViewById(R.id.row_icon);
-            condition = (TextView) itemView.findViewById(R.id.condition);
-            temp = (TextView) itemView.findViewById(R.id.row_temp);
-            wind = (TextView) itemView.findViewById(R.id.row_wind);
+            date = itemView.findViewById(R.id.date);
+            icon = itemView.findViewById(R.id.row_icon);
+            condition = itemView.findViewById(R.id.condition);
+            temp = itemView.findViewById(R.id.row_temp);
+            wind = itemView.findViewById(R.id.row_wind);
         }
     }
 }
