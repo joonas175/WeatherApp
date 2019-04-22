@@ -50,7 +50,7 @@ public class MyWeatherService extends Service {
 
     public void updateWeather(double lat, double lon){
         new ConnectionTask().execute("http://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat +"&lon=" + lon + "&appId=" + appId, "current");
-        new ConnectionTask().execute("http://api.openweathermap.org/data/2.5/forecast?units=metric&lat=" + lat +"&lon=" + lon + "&appId=" + appId + "&cnt=18", "forecast");
+        new ConnectionTask().execute("http://api.openweathermap.org/data/2.5/forecast?units=metric&lat=" + lat +"&lon=" + lon + "&appId=" + appId + "&cnt=24", "forecast");
 
     }
 
